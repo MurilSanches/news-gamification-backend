@@ -1,0 +1,23 @@
+{
+    "compilerOptions": {
+      "target": "ES6",                 
+      "module": "CommonJS",            
+      "outDir": "./dist",              
+      "rootDir": "./src",              
+      "strict": true,                  
+      "esModuleInterop": true,         
+      "forceConsistentCasingInFileNames": true,
+      "skipLibCheck": true,           
+      "resolveJsonModule": true,      
+      "baseUrl": "./src",             
+      "paths": {                      
+        "@routes/*": ["routes/*"],
+        "@controllers/*": ["controllers/*"],
+        "@models/*": ["models/*"],
+        "@database/*": ["database/*"]
+      }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules", "dist"]
+  }
+  
