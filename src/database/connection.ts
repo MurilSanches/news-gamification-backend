@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.POSTGRES_URL;
 
 if (!connectionString) {
-  throw new Error("⚠️ DATABASE_URL não definida no .env");
+  throw new Error("⚠️ POSTGRES_URL não definida no .env");
 }
 
 const sql = postgres(connectionString, {
