@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import sql from "./database/connection"; // Conexão com o banco
 import webhookRoutes from "./routes/webhook.routes";
+import userRoutes from "./routes/user.routes";
+
 
 dotenv.config();
 
@@ -23,6 +25,7 @@ const testDatabaseConnection = async () => {
 (async () => {
   await testDatabaseConnection();
   app.use("/webhook", webhookRoutes);
+  app.use("/user", userRoutes)
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
