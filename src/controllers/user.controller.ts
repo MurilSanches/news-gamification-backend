@@ -2,19 +2,19 @@ import { Request, Response } from "express";
 import sql from "../database/connection";
 
 interface UserParams {
-  email: string;
+  id: string;
 }
 
 export const getUserStreak = async (req: Request<UserParams>, res: Response): Promise<void> => {
   try {
-    const { email } = req.params;
+    const { id } = req.params;
 
-    if (!email) {
-      res.status(400).json({ message: "O email é obrigatório." });
+    if (!id) {
+      res.status(400).json({ message: "O id é obrigatório." });
       return;
     }
 
-    const user = await sql`SELECT * FROM users WHERE email = ${email}`;
+    const user = await sql`SELECT * FROM users WHERE id = ${id}`;
 
     if (user.length === 0) {
       res.status(404).json({ message: "Usuário não encontrado" });
@@ -41,7 +41,7 @@ export const getUserStreak = async (req: Request<UserParams>, res: Response): Pr
       }
     }
 
-    res.status(200).json({ email, name: user[0].name, streak, history: dates });
+    res.status(200).json({ id: userId, email: user[0].email, name: user[0].name, streak, history: dates });
   } catch (error) {
     console.error("Erro ao calcular streak:", error);
     res.status(500).json({ error: "Erro ao calcular streak." });
@@ -58,11 +58,11 @@ interface UserBody {
 
 export const updateUserName = async (req: Request<UserParams, {}, UserBody>, res: Response): Promise<void> => {
   try {
-    const { email } = req.params;
+    const { id } = req.params;
     const { name } = req.body;
 
-    if (!email) {
-      res.status(400).json({ message: "O email é obrigatório." });
+    if (!id) {
+      res.status(400).json({ message: "O id é obrigatório." });
       return;
     }
 
@@ -71,16 +71,16 @@ export const updateUserName = async (req: Request<UserParams, {}, UserBody>, res
       return;
     }
 
-    const user = await sql`SELECT * FROM users WHERE email = ${email}`;
+    const user = await sql`SELECT * FROM users WHERE id = ${id}`;
 
     if (user.length === 0) {
       res.status(404).json({ message: "Usuário não encontrado" });
       return;
     }
 
-    await sql`UPDATE users SET name = ${name} WHERE email = ${email}`;
+    await sql`UPDATE users SET name = ${name} WHERE id = ${id}`;
 
-    res.status(200).json({ message: "Nome atualizado com sucesso", email, name });
+    res.status(200).json({ message: "Nome atualizado com sucesso", id, name });
   } catch (error) {
     console.error("Erro ao atualizar o nome do usuário:", error);
     res.status(500).json({ error: "Erro ao atualizar o nome do usuário." });
