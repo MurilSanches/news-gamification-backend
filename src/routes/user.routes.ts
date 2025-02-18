@@ -3,7 +3,7 @@ import { getUserStreak, updateUserName, getUser  } from "../controllers/user.con
 
 const router: Router = express.Router();
 
-router.get('/:id', getUser)
+router.get('/:email', getUser)
 router.get("/streak/:id", getUserStreak);
 router.put("/:id/name", updateUserName);
 
