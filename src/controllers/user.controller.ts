@@ -5,6 +5,29 @@ interface UserParams {
   id: string;
 }
 
+export const getUser = async (req: Request<{ email: string }>, res: Response): Promise<void> => {
+  try {
+    const { email } = req.params;
+
+    if (!email) {
+      res.status(400).json({ message: "O email é obrigatório." });
+      return;
+    }
+
+    const user = await sql`SELECT * FROM users WHERE email = ${email}`;
+
+    if (user.length === 0) {
+      res.status(404).json({ message: "Usuário não encontrado" });
+      return;
+    }
+
+    res.status(200).json({ id: user[0].id, email: user[0].email, name: user[0].name });
+  } catch (error) {
+    console.error("Erro ao procurar usuário:", error);
+    res.status(500).json({ error: "Erro ao procurar usuário." });
+  }
+}
+
 export const getUserStreak = async (req: Request<UserParams>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
