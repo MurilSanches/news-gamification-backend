@@ -109,3 +109,44 @@ export const updateUserName = async (req: Request<UserParams, {}, UserBody>, res
     res.status(500).json({ error: "Erro ao atualizar o nome do usuário." });
   }
 };
+
+export const getUserHistory = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { id } = req.params;
+    const { page = "1", limit = "10" } = req.query;
+
+    if (!id) {
+      res.status(400).json({ error: "O ID do usuário é obrigatório." });
+      return
+    }
+
+    const pageNumber = parseInt(page as string, 10) || 1;
+    const pageSize = parseInt(limit as string, 10) || 10;
+    const offset = (pageNumber - 1) * pageSize;
+
+    const history = await sql`
+      SELECT id, newsletter_id, opened_at 
+      FROM streaks 
+      WHERE user_id = ${id}
+      ORDER BY opened_at DESC
+      LIMIT ${pageSize} OFFSET ${offset}
+    `;
+
+    const totalCount = await sql`
+      SELECT COUNT(*) AS total FROM streaks WHERE user_id = ${id}
+    `;
+
+    res.status(200).json({
+      history,
+      pagination: {
+        current_page: pageNumber,
+        total_pages: Math.ceil(totalCount[0].total / pageSize),
+        total_items: totalCount[0].total,
+        per_page: pageSize,
+      },
+    });
+  } catch (error) {
+    console.error("Erro ao buscar histórico do usuário:", error);
+    res.status(500).json({ error: "Erro ao buscar histórico do usuário." });
+  }
+};
