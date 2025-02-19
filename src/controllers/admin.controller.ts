@@ -36,13 +36,13 @@ export const getAdminStats = async (_req: Request, res: Response): Promise<void>
 export const getAccessAnalytics = async (_req: Request, res: Response): Promise<void> => {
     try {      
       const weekdaysMap: Record<string, number> = {
-        Sunday: 0,
-        Monday: 0,
-        Tuesday: 0,
-        Wednesday: 0,
-        Thursday: 0,
-        Friday: 0,
-        Saturday: 0,
+        Segunda: 0,
+        'Terça': 0,
+        Quarta: 0,
+        Quinta: 0,
+        Sexta: 0,
+        Sabádo: 0,
+        Domingo: 0,
       };
   
       const hoursMap: Record<number, number> = {};
@@ -73,21 +73,17 @@ export const getRanking = async (req: Request, res: Response): Promise<void> => 
   try {
     const { type, order = "desc", start_date, end_date, page = "1", limit = "10" } = req.query;
 
-    // Validação do tipo
     if (!type || (type !== "users" && type !== "newsletters")) {
       res.status(400).json({ error: "O parâmetro 'type' deve ser 'users' ou 'newsletters'." });
       return
     }
 
-    // Define a direção da ordenação (ASC ou DESC)
     const sortOrder = order === "asc" ? sql`ASC` : sql`DESC`;
 
-    // Paginação
     const pageNumber = parseInt(page as string, 10) || 1;
     const pageSize = parseInt(limit as string, 10) || 10;
     const offset = (pageNumber - 1) * pageSize;
 
-    // Condição de filtro por data
     const startDate = typeof start_date === "string" ? start_date : null;
     const endDate = typeof end_date === "string" ? end_date : null;
     
