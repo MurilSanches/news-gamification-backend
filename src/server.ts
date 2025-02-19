@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import sql from "./database/connection"; // Conexão com o banco
 import webhookRoutes from "./routes/webhook.routes";
 import userRoutes from "./routes/user.routes";
-
+import adminRoutes from "./routes/admin.routes";
 
 dotenv.config();
 
@@ -26,6 +26,7 @@ const testDatabaseConnection = async () => {
   await testDatabaseConnection();
   app.use("/webhook", webhookRoutes);
   app.use("/user", userRoutes)
+  app.use("/admin", adminRoutes);
 
   const PORT = process.env.PORT || 5000;
   app.listen(PORT, () => {
