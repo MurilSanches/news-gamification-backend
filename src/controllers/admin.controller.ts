@@ -36,13 +36,13 @@ export const getAdminStats = async (_req: Request, res: Response): Promise<void>
 export const getAccessAnalytics = async (_req: Request, res: Response): Promise<void> => {
     try {      
       const weekdaysMap: Record<string, number> = {
-        Segunda: 0,
-        'Terça': 0,
-        Quarta: 0,
-        Quinta: 0,
-        Sexta: 0,
-        Sabádo: 0,
-        Domingo: 0,
+        'seg.': 0,
+        'ter.': 0,
+        'qua.': 0,
+        'qui.': 0,
+        'sex.': 0,
+        'sab.': 0,
+        'dom.': 0,
       };
   
       const hoursMap: Record<number, number> = {};
@@ -52,7 +52,10 @@ export const getAccessAnalytics = async (_req: Request, res: Response): Promise<
        
       accesses.forEach((access) => {
         const date = new Date(access.opened_at);
-        const day = date.toLocaleString("en-US", { weekday: "long" });
+        const day = date.toLocaleString("pt-BR", { weekday: "short" });
+
+        console.log(day)
+
         const hour = date.getHours();
   
         weekdaysMap[day] += 1;
