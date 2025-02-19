@@ -74,8 +74,8 @@ export const getRanking = async (req: Request, res: Response): Promise<void> => 
     const { type, order = "desc", start_date, end_date, page = "1", limit = "10" } = req.query;
 
     // Validação do tipo
-    if (!type || (type !== "users" && type !== "newspapers")) {
-      res.status(400).json({ error: "O parâmetro 'type' deve ser 'users' ou 'newspapers'." });
+    if (!type || (type !== "users" && type !== "newsletters")) {
+      res.status(400).json({ error: "O parâmetro 'type' deve ser 'users' ou 'newsletters'." });
       return
     }
 
@@ -100,7 +100,6 @@ export const getRanking = async (req: Request, res: Response): Promise<void> => 
     let totalCount;
 
     if (type === "users") {
-      // Ranking de Usuários baseado no maior streak
       rankingData = await sql`
         SELECT users.id, users.name, users.email, COUNT(DISTINCT DATE(streaks.opened_at)) AS streak
         FROM users
@@ -115,7 +114,6 @@ export const getRanking = async (req: Request, res: Response): Promise<void> => 
         SELECT COUNT(*) AS total FROM users
       `;
     } else {
-      // Ranking de Newsletters mais acessadas
       rankingData = await sql`
         SELECT newsletter_id, COUNT(*) AS views
         FROM streaks
