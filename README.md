@@ -1,4 +1,4 @@
-Add read me# 📢 The News - Gamificação
+# 📢 The News - Gamificação
 
 ## 📌 Sobre o Projeto
 
@@ -14,18 +14,18 @@ Este projeto implementa um sistema de **gamificação** para aumentar o engajame
 - **Supabase** (Serviço de banco de dados e autenticação)
 - **Postgres.js** (Cliente PostgreSQL otimizado para Node.js)
 
-### **Frontend** (Futuro Desenvolvimento)
-- **React.js** (Biblioteca Frontend)
-- **TypeScript**
-
 ## 📂 Estrutura do Projeto
 
 ```
 backend/
 │── src/
+│   ├── constants/            # Constantes globais do projeto
 │   ├── controllers/          # Lógica de negócios das rotas
-│   ├── routes/               # Definição das rotas da API
 │   ├── database/             # Conexão com PostgreSQL (Supabase)
+│   ├── middleware/           # Middlewares de tratamento de erro e autenticação
+│   ├── routes/               # Definição das rotas da API
+│   ├── services/             # Serviços que contêm regras de negócio e consultas ao BD
+│   ├── utils/                # Utilitários globais do projeto
 │   ├── server.ts             # Arquivo principal do servidor
 │── .env                      # Configurações sensíveis do ambiente
 │── package.json              # Dependências e scripts do projeto
@@ -49,7 +49,7 @@ npm install
 Crie um arquivo **`.env`** no diretório `backend/` e adicione suas credenciais do **Supabase**:
 
 ```
-DATABASE_URL=postgresql://usuario:senha@db.rgjzcooknxobmsuyvbfj.supabase.co:5432/postgres
+DATABASE_URL=SUA_URL_SUBAPASE
 PORT=5000
 ```
 
@@ -71,30 +71,6 @@ GET /webhook?email={email}&id={newsletter_id}
 ```
 📌 **Descrição**: Registra a abertura da newsletter por um usuário.
 
-📥 **Parâmetros**:
-- `email` (string) → E-mail do usuário
-- `id` (string) → ID da newsletter
-
-📤 **Respostas**:
-- ✅ **200 OK** → Registro salvo com sucesso
-- ❌ **400 Bad Request** → Faltando parâmetros ou newsletter já registrada
-- ❌ **500 Internal Server Error** → Erro no servidor
-
-📌 **Exemplo de Requisição**:
-```http
-GET /webhook?email=usuario@email.com&id=post_123456
-```
-📌 **Exemplo de Resposta (sucesso)**:
-```json
-{
-  "data": {
-    "id": "post_123456",
-    "email": "usuario@email.com",
-    "message": "Registro salvo com sucesso!"
-  }
-}
-```
-
 ---
 
 ### **2️⃣ Obter Streaks de um Usuário**
@@ -103,49 +79,29 @@ GET /user/{email}
 ```
 📌 **Descrição**: Obtém o streak atual e o histórico de um usuário.
 
-📥 **Parâmetros**:
-- `email` (string) → E-mail do usuário
+---
 
-📤 **Respostas**:
-- ✅ **200 OK** → Retorna os streaks do usuário
-- ❌ **404 Not Found** → Usuário não encontrado
-- ❌ **500 Internal Server Error** → Erro no servidor
-
-📌 **Exemplo de Requisição**:
+### **3️⃣ Obter Estatísticas Administrativas**
 ```http
-GET /user/usuario@email.com
+GET /admin/stats
 ```
-📌 **Exemplo de Resposta (sucesso)**:
-```json
-{
-  "email": "usuario@email.com",
-  "streak": 5,
-  "history": ["2025-02-14", "2025-02-13", "2025-02-12", "2025-02-11", "2025-02-10"]
-}
-```
+📌 **Descrição**: Obtém estatísticas gerais do sistema, como total de usuários, usuário com maior streak e a newsletter mais visualizada.
 
-## 📊 Estrutura do Banco de Dados
+---
 
-### **Tabela `users`**
-Armazena os usuários que abriram newsletters.
-```sql
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### **4️⃣ Obter Análise de Acessos**
+```http
+GET /admin/analytics
 ```
+📌 **Descrição**: Obtém dados de acessos diários e horários para análise.
 
-### **Tabela `streaks`**
-Armazena os registros de abertura de newsletters.
-```sql
-CREATE TABLE streaks (
-    id SERIAL PRIMARY KEY,
-    user_id INT REFERENCES users(id),
-    newsletter_id VARCHAR(255),
-    opened_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+---
+
+### **5️⃣ Obter Ranking de Engajamento**
+```http
+GET /admin/ranking?type={users|newsletters}&order={asc|desc}&start_date={YYYY-MM-DD}&end_date={YYYY-MM-DD}&page={num}&limit={num}
 ```
+📌 **Descrição**: Retorna um ranking dos usuários ou das newsletters mais engajadas.
 
 ## ✅ Melhorias Futuras
 - 📈 Painel administrativo para visualizar métricas de engajamento.
@@ -158,6 +114,4 @@ Este projeto é de uso interno e pode ser utilizado para fins educacionais.
 
 ---
 
-_Desenvolvido com ❤️ por [Seu Nome]_ 🚀
-
- 
+_Desenvolvido com ❤️ por Murilo Sanches_ 🚀
