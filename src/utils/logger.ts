@@ -1,11 +1,17 @@
 import pino from "pino";
 
-const logger = pino({
-  level: "info",
-  transport: {
-    target: "pino-pretty",
-    options: { colorize: true },
-  },
-});
+const isServerless = process.env.VERCEL === "1";
+
+const logger = pino(
+  isServerless
+    ? { level: "info" } // Sem `transport` no Vercel
+    : {
+        level: "info",
+        transport: {
+          target: "pino-pretty",
+          options: { colorize: true },
+        },
+      }
+);
 
 export default logger;
