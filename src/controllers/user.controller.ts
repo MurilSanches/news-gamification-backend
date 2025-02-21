@@ -1,152 +1,92 @@
 import { Request, Response } from "express";
-import sql from "../database/connection";
-
-interface UserParams {
-  id: string;
-}
+import { getUserByEmail, getUserById, updateUser } from "../services/userServices";
+import { messages } from "../constants/messages";
+import { AppError } from "../middleware/errorMiddleware";
+import { handleErrorResponse } from "../utils/handleError";
+import { getAllStreaksHistoryFromUser, getPaginateStreakHistoryFromUser, getStreakCountFromUser } from "../services/streakService";
 
 export const getUser = async (req: Request<{ email: string }>, res: Response): Promise<void> => {
   try {
     const { email } = req.params;
+    if (!email) throw new AppError(messages.invalidEmail, 400);
 
-    if (!email) {
-      res.status(400).json({ message: "O email é obrigatório." });
-      return;
-    }
-
-    const user = await sql`SELECT * FROM users WHERE email = ${email}`;
-
-    if (user.length === 0) {
-      res.status(404).json({ message: "Usuário não encontrado" });
-      return;
-    }
+    const user = await getUserByEmail(email);
+    if (user.length === 0) throw new AppError(messages.userNotFound, 404);
 
     res.status(200).json({ id: user[0].id, email: user[0].email, name: user[0].name });
   } catch (error) {
-    console.error("Erro ao procurar usuário:", error);
-    res.status(500).json({ error: "Erro ao procurar usuário." });
+    handleErrorResponse(error, res);
   }
-}
+};
 
-export const getUserStreak = async (req: Request<UserParams>, res: Response): Promise<void> => {
+export const getUserStreak = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
+    if (!id) throw new AppError(messages.invalidId, 400);
 
-    if (!id) {
-      res.status(400).json({ message: "O id é obrigatório." });
-      return;
-    }
+    const user = await getUserById(id);
+    if (user.length === 0) throw new AppError(messages.userNotFound, 404);
 
-    const user = await sql`SELECT * FROM users WHERE id = ${id}`;
-
-    if (user.length === 0) {
-      res.status(404).json({ message: "Usuário não encontrado" });
-      return;
-    }
-
-    const userId = user[0].id;
-
-    const openings = await sql`
-      SELECT DATE(opened_at) AS opened_date 
-      FROM streaks 
-      WHERE user_id = ${userId} 
-      ORDER BY opened_at DESC`;
+    const openings = await getAllStreaksHistoryFromUser(id)
 
     const dates = openings.map((row) => row.opened_date);
-
     let streak = 1;
-    for (let i = 0; i < dates.length - 1; i++) {
-      const diff = (new Date(dates[i]).getTime() - new Date(dates[i + 1]).getTime()) / (1000 * 60 * 60 * 24);
-      if (diff === 1) {
+
+    for (let i = 1; i < dates.length; i++) {
+      const diffDays = (new Date(dates[i - 1]).getTime() - new Date(dates[i]).getTime()) / (1000 * 60 * 60 * 24);
+      if (diffDays === 1) {
         streak++;
       } else {
         break;
       }
     }
 
-    res.status(200).json({ id: userId, email: user[0].email, name: user[0].name, streak, history: dates });
+    res.status(200).json({ id, streak, history: dates });
   } catch (error) {
-    console.error("Erro ao calcular streak:", error);
-    res.status(500).json({ error: "Erro ao calcular streak." });
+    handleErrorResponse(error, res);
   }
 };
 
-interface UserParams {
-  email: string;
-}
-
-interface UserBody {
-  name: string;
-}
-
-export const updateUserName = async (req: Request<UserParams, {}, UserBody>, res: Response): Promise<void> => {
+export const updateUserName = async (req: Request<{ id: string }, {}, { name: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
     const { name } = req.body;
 
-    if (!id) {
-      res.status(400).json({ message: "O id é obrigatório." });
-      return;
-    }
+    if (!id) throw new AppError(messages.invalidId, 400);
+    if (!name || name.trim() === "") throw new AppError(messages.invalidName, 400);
 
-    if (!name || name.trim() === "") {
-      res.status(400).json({ message: "O nome é obrigatório." });
-      return;
-    }
+    const user = await getUserById(id);
+    if (user.length === 0) throw new AppError(messages.userNotFound, 404);
 
-    const user = await sql`SELECT * FROM users WHERE id = ${id}`;
-
-    if (user.length === 0) {
-      res.status(404).json({ message: "Usuário não encontrado" });
-      return;
-    }
-
-    await sql`UPDATE users SET name = ${name} WHERE id = ${id}`;
-
-    res.status(200).json({ message: "Nome atualizado com sucesso", id, name });
+    await updateUser(id, name);
+    res.status(200).json({ message: messages.userUpdated, id, name });
   } catch (error) {
-    console.error("Erro ao atualizar o nome do usuário:", error);
-    res.status(500).json({ error: "Erro ao atualizar o nome do usuário." });
+    handleErrorResponse(error, res);
   }
 };
 
-export const getUserHistory = async (req: Request, res: Response): Promise<void> => {
+export const getUserHistory = async (req: Request<{ id: string }, {}, {}, { page?: string; limit?: string }>, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { page = "1", limit = "10" } = req.query;
+    if (!id) throw new AppError(messages.invalidId, 400);
 
-    if (!id) {
-      res.status(400).json({ error: "O ID do usuário é obrigatório." });
-      return
-    }
+    const page = parseInt(req.query.page || "1", 10);
+    const limit = parseInt(req.query.limit || "10", 10);
+    const offset = (page - 1) * limit;
 
-    const pageNumber = parseInt(page as string, 10) || 1;
-    const pageSize = parseInt(limit as string, 10) || 10;
-    const offset = (pageNumber - 1) * pageSize;
-
-    const history = await sql`
-      SELECT id, newsletter_id, opened_at 
-      FROM streaks 
-      WHERE user_id = ${id}
-      ORDER BY opened_at DESC
-      LIMIT ${pageSize} OFFSET ${offset}
-    `;
-
-    const totalCount = await sql`
-      SELECT COUNT(*) AS total FROM streaks WHERE user_id = ${id}
-    `;
+    const history = await getPaginateStreakHistoryFromUser(id, limit, offset)
+    const [{ total }] = await getStreakCountFromUser(id)
 
     res.status(200).json({
       history,
       pagination: {
-        current_page: pageNumber,
-        total_pages: Math.ceil(totalCount[0].total / pageSize),
-        total_items: totalCount[0].total,
-        per_page: pageSize,
+        current_page: page,
+        total_pages: Math.ceil(total / limit),
+        total_items: total,
+        per_page: limit,
       },
     });
   } catch (error) {
-    console.error("Erro ao buscar histórico do usuário:", error);
-    res.status(500).json({ error: "Erro ao buscar histórico do usuário." });
+    handleErrorResponse(error, res);
   }
 };

@@ -1,46 +1,41 @@
 import { Request, Response } from "express";
-import sql from "../database/connection";
+
+import { AppError } from "../middleware/errorMiddleware";
+import { handleErrorResponse } from "../utils/handleError";
+import { createUser, getUserByEmail } from "../services/userServices";
+import { messages } from "../constants/messages";
+import { addStreak, getStreak } from "../services/streakService";
 
 export const receiveWebhook = async (req: Request, res: Response): Promise<void> => {
   try {
     const { email, id } = req.query as { email?: string; id?: string };
 
     if (!email || !id) {
-      res.status(400).json({ error: "Email e ID são obrigatórios." });
-      return;
+      throw new AppError(messages.invalidIdAndEmail, 400);
     }
 
-    let user = await sql`SELECT * FROM users WHERE email = ${email} LIMIT 1`;
-  
+    let user = await getUserByEmail(email);
     if (user.length === 0) {
-      user = await sql`
-        INSERT INTO users (email) 
-        VALUES (${email}) 
-        RETURNING *`;
+      user = await createUser(email)
     }
 
     const userId = user[0].id;
 
-    let existingStreak = await sql`
-    SELECT * FROM streaks 
-    WHERE user_id = ${userId} AND newsletter_id = ${id} 
-    LIMIT 1`;
+    const existingStreak = await getStreak(userId, id)
 
     if (existingStreak.length > 0) {
-      res.status(400).json({ error: "O usuário já registrou abertura para essa newsletter." });
-      return;
+      throw new AppError(messages.userHasStreak, 400);
     }
 
-    await sql`
-      INSERT INTO streaks (user_id, newsletter_id) 
-      VALUES (${userId}, ${id})`;
+    await addStreak(userId, id)
 
-    res.status(200).json({ data: {
-      id: id,
-      email: email,
-    } });
+    res.status(200).json({
+      data: {
+        id,
+        email,
+      },
+    });
   } catch (error) {
-    console.error("Erro ao processar webhook:", error);
-    res.status(500).json({ error: "Erro ao processar webhook." });
+    handleErrorResponse(error, res);
   }
 };
