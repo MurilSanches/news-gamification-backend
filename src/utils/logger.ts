@@ -4,7 +4,7 @@ const isServerless = process.env.VERCEL === "1";
 
 const logger = pino(
   isServerless
-    ? { level: "info" } // Sem `transport` no Vercel
+    ? { level: "info" }
     : {
         level: "info",
         transport: {
