@@ -103,11 +103,23 @@ GET /admin/ranking?type={users|newsletters}&order={asc|desc}&start_date={YYYY-MM
 ```
 📌 **Descrição**: Retorna um ranking dos usuários ou das newsletters mais engajadas.
 
+## 📂 Collection do Postman
+
+Para facilitar a utilização e testes da API, disponibilizamos uma **Collection do Postman** contendo todas as rotas documentadas.
+
+📥 **Download da Collection**:
+[Baixar Collection Postman](./waffle.postman_collection.json)
+
+📌 **Como importar no Postman**:
+1. Abra o Postman
+2. Vá em **File** > **Import**
+3. Selecione o arquivo `postman_collection.json`
+4. Acesse os endpoints diretamente no Postman para testar a API
+
+
 ## ✅ Melhorias Futuras
-- 📈 Painel administrativo para visualizar métricas de engajamento.
 - 🏆 Implementação de **badges e conquistas** para incentivar os usuários.
 - 🔔 **Notificações via e-mail** para manter os streaks.
-- 📊 **Gráficos interativos** para estatísticas dos usuários.
 
 ## 📝 Licença
 Este projeto é de uso interno e pode ser utilizado para fins educacionais.

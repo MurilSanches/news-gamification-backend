@@ -1,0 +1,177 @@
+{
+	"info": {
+		"_postman_id": "41a590cb-4ebc-4d7a-9ba0-a44368f028cb",
+		"name": "waffle",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "9221279"
+	},
+	"item": [
+		{
+			"name": "WEBHOOK",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/webhook/?email={{$randomEmail}}&id=123",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"webhook",
+						""
+					],
+					"query": [
+						{
+							"key": "email",
+							"value": "{{$randomEmail}}"
+						},
+						{
+							"key": "id",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/user/murilosanchesp@gmail.com",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"user",
+						"murilosanchesp@gmail.com"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "USER HISTORY",
+			"request": {
+				"method": "GET",
+				"header": []
+			},
+			"response": []
+		},
+		{
+			"name": "STREAK",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/user/streak/1",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"user",
+						"streak",
+						"1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "CREATE NAME",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"teste\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URL}}/user/2/name",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"user",
+						"2",
+						"name"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "MAIN STATS",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/admin/stats",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"admin",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "GRAPHIC",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/admin/stats",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"admin",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "RANKING",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/admin/stats",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"admin",
+						"stats"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
